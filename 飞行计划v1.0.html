@@ -1,0 +1,374 @@
+<!DOCTYPE html>  
+<html>
+<head>  
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+<title>飞行计划</title> 
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=F6u9AolWRSRtqK9VQf0N3E3g626Ob2Zd">
+</script>
+ <script type="text/javascript" src="http://api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+  <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+<style type="text/css">  
+.anchorBL{display:none}
+
+html{height:100%}  
+body{height:100%;margin:0px;padding:0px}  
+#container{height:70%; width:85%;
+    float:left;
+    padding:10px;} 
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+	height:30%
+}	
+#nav {
+    line-height:30px;
+    background-color:#E5F1FD;
+    height:70%;
+    width:15%;
+    float:right;
+    padding:5px; 
+
+}
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 20px;
+    cursor: pointer;
+	 float:left;
+}
+.button2 {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #227700;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 20px;
+  padding: 10px;
+  width: 250px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+}
+
+</style>
+</head>  
+
+<body onload="initialize()"><!--定义动态刷新-->
+<div id="header">
+	
+<h1 >飞行计划查询系统</h1>
+
+<form name="form" action="" method="post" style=" float:left;font-size:20px" size="20px">
+        起飞机场：<input type="text" style="width:100px; height:50px;color:black"  name="qifei" > →
+		 降落机场：<input type="text" name="jiangluo" size="6"style="width:100px; height:50px;color:black"> 
+		 </form>
+        <input type="button" class="button" value="查询" onclick="chaxun() " style="color:black;" >
+		<input type="button" value="民航态势监视(单击跳转)" class="button2"  style=" position:relative;"
+onclick="javascrtpt:window.location.href='file:///C:/Users/win/Desktop/%E7%BB%BC%E5%90%88%E8%AE%BE%E8%AE%A1/%E5%85%A8%E6%96%B0%E7%89%88%E6%9C%AC.html'">
+
+<br><br>
+		<button id="run" class="button"style="float:middle;" >开始</button>
+<button id="stop"class="button">停止</button>
+<button id="pause"class="button">暂停</button>
+
+		<br><br><br>
+<p style=" float:left;font-size:10px">	当前系统仅支持ZBAA-ZUUU ZSSS-ZUUU ZBAA-ZSSS三条航线查询</p>
+
+
+
+</div>
+
+
+
+
+<div id="container">
+<script type="text/javascript"> 
+var map = new BMap.Map("container");
+// 创建地图实例  
+var point = new BMap.Point(116.598333,40.073333);//创建坐标点 
+
+var points1 = [
+new BMap.Point(116.598333,40.073333),
+new BMap.Point(115.446667,39.755000),
+new BMap.Point(114.603333,39.146667),
+new BMap.Point(113.926667,38.675000),
+new BMap.Point(113.081667,38.083333),
+new BMap.Point(112.620000,37.748333),
+new BMap.Point(110.510000,36.473333),
+new BMap.Point(109.376667,35.778333),
+new BMap.Point(108.995000,34.820000),
+new BMap.Point(108.915000,34.598333),
+new BMap.Point(108.853333,34.221667),
+new BMap.Point(108.311667,33.318333),
+new BMap.Point(107.495000,32.810000),
+new BMap.Point(106.710000,32.328333),
+new BMap.Point(105.598333,31.631667),
+new BMap.Point(104.748333,31.096667),
+new BMap.Point(103.948333,30.580000),
+]
+var points2 = [
+new BMap.Point(121.335000,31.196667),
+new BMap.Point(120.320000,31.590000),
+new BMap.Point(119.673333,31.620000),
+new BMap.Point(119.143333,31.645000),
+new BMap.Point(119.040000,31.650000),
+new BMap.Point(118.988333,31.655000),
+new BMap.Point(118.105000,31.718333),
+new BMap.Point(117.301667,31.775000),
+new BMap.Point(117.008333,31.685000),
+new BMap.Point(115.881667,31.321667),
+new BMap.Point(115.280000,31.128333),
+new BMap.Point(114.460000,30.865000),
+new BMap.Point(114.203333,30.781667),
+new BMap.Point(113.143333,30.638333),
+new BMap.Point(111.476667,30.563333),
+new BMap.Point(109.601667,30.291667),
+new BMap.Point(109.438333,30.318333),
+new BMap.Point(106.188333,30.810000),
+new BMap.Point(104.948333,30.661667),
+new BMap.Point(103.948333,30.580000),
+]
+var points3 = [
+new BMap.Point(116.598333,40.073333),
+new BMap.Point(116.991667,39.130000),
+new BMap.Point(117.165000,37.356667),
+new BMap.Point(117.215000,36.833333),
+new BMap.Point(117.213333,36.418333),
+new BMap.Point(117.368333,36.000000),
+new BMap.Point(117.803333,34.823333),
+new BMap.Point(117.998333,34.278333),
+new BMap.Point(118.266667,33.970000),
+new BMap.Point(118.705000,33.466667),
+new BMap.Point(118.855000,33.296667),
+new BMap.Point(118.940000,33.196667),
+new BMap.Point(119.160000,32.941667),
+new BMap.Point(119.575000,32.463333),
+new BMap.Point(119.761667,32.246667),
+new BMap.Point(120.191667,31.743333),
+new BMap.Point(120.319444,31.589444),
+new BMap.Point(121.335000,31.196667),
+]
+map.centerAndZoom(point, 4);
+// 初始化地图，设置中心点坐标和地图级别  
+map.enableScrollWheelZoom();
+map.addControl(new BMap.MapTypeControl());
+//设置地图可以用滑轮缩小放大
+/*	var pt = new BMap.Point(116.4, 39.9);
+	var myIcon = new
+BMap.Icon("feiji8.gif", new BMap.Size(20,20) );
+	var marker = new BMap.Marker(pt,{icon:myIcon});  // 创建标注
+	map.addOverlay(marker);              // 将标注添加到地图中
+	*/
+var styleJson = [
+		 {
+		   "featureType": "all",
+		   "elementType": "geometry",
+		   "stylers": {
+					 "hue": "#007fff",
+					 "saturation": 89
+		   }
+		 },
+		 {
+		   "featureType": "water",
+		   "elementType": "all",
+		   "stylers": {
+					 "color": "#ffffff"
+		   }
+		 }
+	 ]
+	map.setMapStyle({styleJson:styleJson});
+	/*以下均为飞机飞行的模拟*/
+	
+	var myIcon = new BMap.Icon('https://raw.githubusercontent.com/lichunzhuo/pic/master/B747_S000.png',new BMap.Size(44,44),{anchor:new BMap.Size(22,22)});
+	var myIcon2 = new BMap.Icon('https://raw.githubusercontent.com/lichunzhuo/pic/master/airport22.gif',new BMap.Size(22,22),{anchor:new BMap.Size(11,11)});
+	
+
+var airport_points = [
+new BMap.Point(116.598333,40.073333),
+new BMap.Point(103.948333,30.580000),
+new BMap.Point(121.335000,31.196667),
+]
+var airports = [
+  'ZBAA',
+  'ZUUU',
+  'ZSSS',
+]
+		var airport_marker = new BMap.Marker(airport_points[0],{icon:myIcon2});  // 创建标注
+	map.addOverlay(airport_marker);              // 将标注添加到地图中
+	airport_marker.disableMassClear(); 
+	airport_marker.addEventListener("click",getAttr1);
+	function getAttr1(){
+		var p = airport_marker.getPosition();       //获取marker的位置
+		alert('ZBAA北京国际机场'+"的位置是(" + p.lng + "," + p.lat+")");   
+
+	}
+			var airport_marker = new BMap.Marker(airport_points[1],{icon:myIcon2});  // 创建标注
+	map.addOverlay(airport_marker);              // 将标注添加到地图中
+	airport_marker.disableMassClear(); 
+	airport_marker.addEventListener("click",getAttr2);
+	function getAttr2(){
+		var p = airport_marker.getPosition();       //获取marker的位置
+		alert('ZUUU成都双流国际机场'+"的位置是(" + p.lng + "," + p.lat+")");   
+
+	}
+			var airport_marker = new BMap.Marker(airport_points[2],{icon:myIcon2});  // 创建标注
+	map.addOverlay(airport_marker);  
+airport_marker.disableMassClear(); 	// 将标注添加到地图中
+	airport_marker.addEventListener("click",getAttr3);
+	function getAttr3(){
+		var p = airport_marker.getPosition();       //获取marker的位置
+		alert('ZSSS上海虹桥国际机场'+"的位置是(" + p.lng + "," + p.lat+")");   
+
+	}
+	
+airport_marker.disableMassClear(); 
+
+var select="未输入航线";
+    function chaxun(){
+	f=form
+ if(f.qifei.value=="ZBAA"&&f.jiangluo.value=="ZUUU"){
+       select="ZBAA to ZUUU";
+	   map.clearOverlays(); 
+
+		map.addOverlay(polyline1);
+ 
+}
+
+else if(f.qifei.value=="ZSSS"&&f.jiangluo.value=="ZUUU"){
+       select="ZSSS to ZUUU";
+	   map.clearOverlays(); 
+		map.addOverlay(polyline2);
+       }
+
+else if(f.qifei.value=="ZBAA"&&f.jiangluo.value=="ZSSS"){
+       select="ZBAA to ZSSS";
+	   map.clearOverlays(); 
+		map.addOverlay(polyline3);
+  }
+
+else {
+       select="未输入航线";
+
+		map.clearOverlays(); 
+        alert("请输入正确的起飞机场和降落机场");
+		
+		}
+
+}
+	
+	 function refreshNumInfo(){
+        var i = document.getElementById('numinfo');
+        i.innerHTML = '当前航线：'+"<br>"+select ;
+    }
+
+	var polyline1= new BMap.Polyline(points1,{
+	enableEditing:false,
+	enableClicking:true,
+	
+	strokeWeight:8,
+	strokepacity:0.8,
+	strokeColor:"#18a45b"});
+	var polyline2= new BMap.Polyline(points2,{
+	enableEditing:false,
+	enableClicking:true,
+	
+	strokeWeight:8,
+	strokepacity:0.8,
+	strokeColor:"#18a45b"});
+
+var polyline3= new BMap.Polyline(points3,{
+	enableEditing:false,
+	enableClicking:true,
+	
+	strokeWeight:8,
+	strokepacity:0.8,
+	strokeColor:"#18a45b"});
+
+
+
+
+	// 实例化一个驾车导航用来生成路线
+var lushu1=new BMapLib.LuShu(map, points1, { 
+landmarkPois:[
+  ],
+autoView:false,
+icon:myIcon,
+speed:30000,
+enableRotation:true,});
+var lushu2=new BMapLib.LuShu(map, points2, {
+ landmarkPois:[
+  ],
+autoView:false,
+icon:myIcon,
+speed:30000,
+enableRotation:true,});
+var lushu3=new BMapLib.LuShu(map, points3, {
+ landmarkPois:[
+  ],
+autoView:false,
+icon:myIcon,
+speed:30000,
+enableRotation:true,});
+
+
+	
+
+function initialize(){
+        //loadSettings();
+        /* 以1s的周期获取数据及刷新信息板 */
+        window.setInterval(function() {
+            refreshNumInfo();
+
+            //setTable();
+        }, 1000);
+    }
+
+	$("run").onclick = function(){
+
+		if( select=="ZBAA to ZUUU"){
+		lushu1.start();}
+	else if( select=="ZSSS to ZUUU"){
+		lushu2.start();}
+	else if	( select=="ZBAA to ZSSS")
+		lushu3.start();
+	}
+	$("stop").onclick = function(){
+	lushu1.stop();
+	lushu2.stop();
+	lushu3.stop();
+	
+	}
+	$("pause").onclick = function(){
+	lushu1.pause();
+	lushu2.pause();
+	lushu3.pause();
+	}
+
+	function $(element){
+		return document.getElementById(element);
+	}
+</script> 
+ </div>
+<div id="nav2">
+<font size="6" color= #2F4F4F id="numinfo">当前航线：
+<br>
+未输入航线</font>
+<hr>
+
+</div>
+</body>  
+</html>

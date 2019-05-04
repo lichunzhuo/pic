@@ -1,0 +1,777 @@
+<!DOCTYPE html> 
+<html>
+<head>  
+<meta charset="utf-8"> 
+ <meta http-equiv="X-UA-Compatible" content="IE=edge"><!--通用规则-->
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  <!--页面元素信息-->
+<title>空中交通管制系统</title>  <!--页面标题-->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=F6u9AolWRSRtqK9VQf0N3E3g626Ob2Zd">
+</script>
+ <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+  <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+<style type="text/css">  
+html{height:100%}  
+body{height:100%;margin:0px;padding:0px}  
+#container{height:80%; width:80%;
+    float:left;
+    padding:10px;} 
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+	height:15%
+}	
+#nav {
+    line-height:30px;
+    background-color:#E5F1FD;
+    height:80%;
+    width:10%;
+    float:left;
+    padding:5px; 
+}
+#nav2 {
+    line-height:30px;
+    background-color:#E5F1FD ;
+    height:80%;
+    width:10%;
+    float:right;
+    padding:5px; 
+}
+
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+    padding:5px; 
+	height:5%
+}
+.button1 {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #227700;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 28px;
+  padding: 10px;
+  width: 160px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button2 {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #227700;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 20px;
+  padding: 10px;
+  width: 250px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+.button1 span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button1 span:after {
+  content: '»';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button1:hover span {
+  padding-right: 25px;
+}
+
+.button1:hover span:after {
+  opacity: 1;
+  right: 0;
+  
+}
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position:absolute;
+	z-index:1;
+	  left:100%;
+	  top:0px;
+	
+    background-color:#33FF33 ;
+    min-width: 250px;
+	min-height: 90%;
+	  cursor: pointer;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .button1 {
+    background-color:#55AA00 ;
+}
+</style>
+</head>  
+
+<body onload="initialize()"><!--定义动态刷新-->
+<div id="header">
+	
+<h1>空中交通管制系统</h1>
+<input type="button"class="button2" value="飞行计划查询(单击跳转)"   
+onclick="javascrtpt:window.location.href='file:///C:/Users/win/Desktop/%E7%BB%BC%E5%90%88%E8%AE%BE%E8%AE%A1/jihua.html'">
+
+
+</div>
+
+<div id="nav">
+<div class="dropdown">
+<button class="button1" style="vertical-align:middle"><span>标签 </span></button>
+  <div class="dropdown-content">
+    <form action="">
+<form>
+<input type="checkbox" name="tips" id="labelFlight">航班号<br>
+<input type="checkbox" name="tips"  id="labelAltitude">海拔 <br>
+<input type="checkbox" name="tips"  id="labelSpeed">速度<br>
+<input type="checkbox" name="tips" id="labelICAO">ICAO<br>
+<p>标签信息放大至地图九级以上才会显示</p>
+
+</form>
+</form>
+  </div>
+</div>
+<div class="dropdown">
+<button class="button1" style="vertical-align:middle"><span>通用</span></button>
+  <div class="dropdown-content">
+    <form action="">
+<form>
+<input type="checkbox" name="usual" id="planeTracking">跟踪当前飞机<br>
+<input type="checkbox" name="usual" id="traceShowing">全部飞机轨迹
+</form>
+</form>
+  </div>
+</div>
+
+</div>
+
+<div id="nav2">
+<font size="6" color= #2F4F4F id="numinfo">当前共有 0 架飞机显示在屏幕上</font>
+<hr>
+<font size="5" color= #2F4F4F id="selectedinfo">单击飞机查看详细信息</font>
+
+
+</div>
+<div id="container">
+<script type="text/javascript"> 
+var styleJson = [
+		 {
+		   "featureType": "all",
+		   "elementType": "geometry",
+		   "stylers": {
+					 "hue": "#007fff",
+					 "saturation": 89
+		   }
+		 },
+		 {
+		   "featureType": "water",
+		   "elementType": "all",
+		   "stylers": {
+					 "color": "#ffffff"
+		   }
+		 }
+	 ]
+
+    /* 地图的初始化及基本设置 */
+    var map = new BMap.Map("container",{enableMapClick:false}); //初始化地图，禁止点击地图自带图标
+    var point = new BMap.Point(110.3380410000,25.1205800000); //贵阳 （为配合/testfile/complex.txt数据）
+    var point2 = new BMap.Point(116.404,39.915); //北京（为配合实际测量地点）
+    var mapStyleIndic = null; //记录地图风格信息
+    map.centerAndZoom(point2, 9); //中心焦点及放大程度
+    map.enableScrollWheelZoom(true); //允许滚轮放大、缩小
+ map.setMapStyle({styleJson:styleJson});
+    
+    var mapType = new BMap.MapTypeControl({anchor: BMAP_ANCHOR_BOTTOM_RIGHT});
+    map.addControl(mapType); //右下角默认地图控件
+    map.setCurrentCity("北京"); //设置3d图城市
+
+
+    /* 飞机功能相关的初始化 */
+    var Planes = {};
+    var NumOfPlanes = 0;
+    var Selected = null; //用于标记当前选中的飞机的hex 
+    var historyPoints = {}; //历史位置信息，用以绘制轨迹
+    var planeTrace = {}; //储存轨迹
+    var point_now = {}; //当前位置
+    var traceOld = null; //储存BMap.Polyline
+    var traceNew = null; 
+
+    /* 绘圆相关功能的初始化 */
+    var circleRange = null; //储存圆半径(最大的)
+    var circleRangeOld = null;
+    var circleLon = null;
+    var circleLonOld = null;
+    var circleLat = null;
+    var circleLatOld = null;
+    /* 初始化圆形覆盖物 */
+    var rangeCircleMarker = [];
+    for (var i = 0; i < 5; i++){
+        var circleInfo = {
+            strokeColor:"grey", 
+            strokeWeight:(i % 2 == 0 ? '2' : '1'), 
+            enableClicking:false, 
+            fillColor:"none" 
+        };
+        rangeCircleMarker[i] = new BMap.Circle(map.getCenter(), 100000, circleInfo);
+    }
+    
+    /* 轨迹全部显示模式与选中显示模式的切换 */
+    $("#traceShowing").change(function() {
+        var traceShowIndic = $("#traceShowing");
+        /* 若为由非全显切换到全显，显示全部轨迹 */
+        if (traceShowIndic.prop("checked")) {
+            for (var p in Planes) {
+                for (var i = 0; i < planeTrace[p].length; i++){
+                    map.addOverlay(planeTrace[p][i]);
+                }
+            }
+        }
+        /* 若由全显切换到非全显，隐藏全部轨迹，若有选中则显示选中的 */
+        else {
+            for (var p in Planes) {
+                for (var i = 0; i < planeTrace[p].length; i++){
+                    map.removeOverlay(planeTrace[p][i]);
+                }
+            }
+            if (Selected) {
+                for (var i = 0; i < planeTrace[Selected].length; i++){
+                    map.addOverlay(planeTrace[Selected][i]);
+                }
+            }
+        } 
+    });
+
+    /* 根据是否为选中的飞机，返回绘制飞机所需参数,调用百度地图控件的 */
+    function setIconInfo2(plane){
+        var selected = (plane.hex === Selected); //判断是否为所选中的飞机     
+        var FlightInfo = {
+            icon: new BMap.Symbol(BMap_Symbol_SHAPE_PLANE, {
+            scale: 1.5,
+            strokeWeight: 1, 
+            fillColor: (selected ? 'lime' : 'yellow'),
+            fillOpacity: 0.8, //对BMap矢量图标，若不设置透明度就无法染色
+            rotation: plane.track
+        })
+        };        
+        return FlightInfo; //返回百度地图绘制图标所需参数       
+    }
+
+    /* 根据是否为选中的飞机，返回绘制飞机所需参数,调用自定义图标的 */
+    function setIconInfo(plane){
+        var selected = (plane.hex === Selected); //判断是否为所选中的飞机  
+        var angle = null; //angle应为2位数
+        var myIcon = null;
+        var str = null;
+        if (selected) {
+            str = 'planes/selected/';
+        }
+        else{
+            str = 'planes/';
+        }
+        angle = Math.round( plane.track / 10 ) * 10; //四舍五入地将角度取整数倍以对应图标
+        if (angle > 350){
+            angle = 0;
+        }
+        if (angle==0){
+            myIcon = new BMap.Icon("https://raw.githubusercontent.com/Kiyoaki-w/dump1090-tty/master/img/" + str + "B747_S000.png", new BMap.Size(44,44));            
+        }
+        if (angle < 100 && angle != 0){
+            myIcon = new BMap.Icon("https://raw.githubusercontent.com/Kiyoaki-w/dump1090-tty/master/img/" + str + "B747_S0" + angle + ".png", new BMap.Size(44,44));            
+        }
+        if (angle > 90){
+            myIcon = new BMap.Icon("https://raw.githubusercontent.com/Kiyoaki-w/dump1090-tty/master/img/" + str + "B747_S" + angle + ".png", new BMap.Size(44,44));
+        }   
+        var FlightInfo = {icon: myIcon};        
+        return FlightInfo; //返回百度地图绘制图标所需参数       
+    }
+
+
+    /*
+    function setShadowInfo(plane){
+        var FlightInfo = {
+            icon: new BMap.Symbol(BMap_Symbol_SHAPE_PLANE, {
+            scale: 2,
+            strokeWeight: 1, 
+            fillColor: "grey",
+            fillOpacity: 0.8, //对BMap矢量图标，若不设置透明度就无法染色
+            rotation: plane.track
+        })
+        };        
+        return FlightInfo; //返回百度地图绘制图标所需参数       
+    }
+    */
+
+
+    /* 轨迹模式1：根据飞机当前海拔，返回绘制轨迹所需参数，虚线，海拔越高越蓝 */
+    function setTraceInfo2(plane){
+        var r = 0;
+        var g = 0;
+        var b = null;
+        var maxAltitude = 40000; //最大海拔40000feet
+        if (plane.altitude > maxAltitude) {
+            b = 255; 
+        }
+        else{
+            b = 100 + 155 * plane.altitude / maxAltitude;
+        }
+        var TraceInfo = {
+            strokeColor: 'rgb('+r+','+g+','+b+')', 
+            strokeWeight: 2, 
+            strokeOpacity: 0.5,
+            strokeStyle: 'dashed'
+        }
+        return TraceInfo;
+    }
+
+    /* 轨迹模式2：根据飞机当前海拔，返回绘制轨迹所需参数，实线，海拔越高越透明度越低 */
+    function setTraceInfo(plane){
+        var b = null;
+        var maxAltitude = 40000; //最大海拔40000feet
+        if (plane.altitude > maxAltitude) {
+            b = 1; 
+        }
+        else{
+            b = plane.altitude / maxAltitude;
+        }
+        var TraceInfo = {
+            strokeColor: 'black', 
+            strokeWeight: 2, 
+            strokeOpacity: b,
+            strokeStyle: 'solid'
+        }
+        return TraceInfo;
+    }
+
+    /* 根据复选框选中情况，返回飞机标牌文本 */
+    function getLabelText(plane){
+        var text = '';
+        var lab_ICAO = $("#labelICAO").prop("checked");
+        var lab_Flight = $("#labelFlight").prop("checked");
+        var lab_Altitude = $("#labelAltitude").prop("checked");
+        var lab_Speed = $("#labelSpeed").prop("checked");
+        if (lab_Flight){
+            text += plane.flight + '<br>';
+        }
+        if (lab_Altitude){
+            text += plane.altitude + '<br>';
+        }
+        if (lab_Speed){
+            text += plane.speed + '<br>';
+        }
+        if (lab_ICAO){
+            text += plane.hex;
+        }
+        return text;
+    }
+
+
+
+
+
+    function selectPlane(){
+        if (!Planes[this.planehex]) return; // 若飞机序列里没有当前选中的飞机，则返回
+        var old = Selected; // 将前次选中保存到old 
+        Selected = this.planehex; // 保存当前选中
+        
+        //console.log('this:'+this.planehex); 
+        
+        if (old) {
+            
+            /* 为前次选中的修复图标 */
+            map.removeOverlay(Planes[old].marker); // 通过重新生成marker的方式实时调整图标，经验证setIcon方法不能实时更新 
+            Planes[old].marker = new BMap.Marker(new BMap.Point(Planes[old].lon ,Planes[old].lat),setIconInfo(Planes[old]));
+            //Planes[old].marker.addEventListener("click", selectPlane);
+            Planes[old].marker.planehex = old; //为重新生成的marker添加hex信息
+            map.addOverlay(Planes[old].marker);
+            Planes[old].marker.addEventListener("click", selectPlane);
+            /* 为前次选中的修复标牌 */ 
+            if (map.getZoom()>9) {
+                label = new BMap.Label(getLabelText(Planes[old]),{offset:new BMap.Size(30,-20)}); // 为飞机创建标签 
+                label.setStyle({maxWidth: "none",
+                                border: "0px",
+                                backgroundColor: "rgba(255,255,255,0.5)"});
+                Planes[old].marker.setLabel(label);
+            }
+            
+            /* 若非全显模式，隐藏前次轨迹 */
+            var traceShowIndic = $("#traceShowing");
+            if (!traceShowIndic.prop("checked")){
+                for (var i = 0; i < planeTrace[old].length; i++){
+                    map.removeOverlay(planeTrace[old][i]);
+                }
+            }
+            
+
+        }
+        
+        /* 为当前选中的新建图标 */
+        map.removeOverlay(Planes[Selected].marker);
+        Planes[Selected].marker = new BMap.Marker(new BMap.Point(Planes[Selected].lon ,Planes[Selected].lat),setIconInfo(Planes[Selected]));
+        //Planes[Selected].marker.addEventListener("click", selectPlane);
+        map.addOverlay(Planes[Selected].marker);
+        Planes[Selected].marker.addEventListener("click", selectPlane);
+        
+        /* 为当前选中的新建标牌 */
+        label = new BMap.Label(getLabelText(Planes[Selected]),{offset:new BMap.Size(30,-20)}); // 为飞机创建标签 
+        label.setStyle({maxWidth: "none",
+                        border: "0px",
+                        backgroundColor: "rgba(255,255,255,0.5)"});
+        Planes[Selected].marker.setLabel(label);
+    
+
+        /* 若非全显模式，显示当前轨迹 */
+        if (!traceShowIndic.prop("checked")) {
+            for (var i = 0; i < planeTrace[Selected].length; i++){
+                map.addOverlay(planeTrace[Selected][i]);
+            }
+        }            
+
+        refreshSelectInfo(); //刷新信息板
+
+
+    }
+
+    function refreshNumInfo(){
+        var i = document.getElementById('numinfo');
+        i.innerHTML = '当前共有 ' + NumOfPlanes + ' 架飞机显示在屏幕上';
+    }
+
+
+    function refreshSelectInfo(){
+        var i = document.getElementById('selectedinfo');
+        var p = Planes[Selected];
+        if (!p) return;
+        var html = '所选飞机信息:<br>'; 
+        html += 'ICAO: '+p.hex+'<br>';
+        if (p.flight.length) {
+            html += '<b>'+p.flight+'</b><br>';
+        }
+        html += '海拔: '+p.altitude+' feet<br>';
+        html += '速度: '+p.speed+' knots<br>';
+        html += '经纬度: '+p.lat+', '+p.lon+'<br>';
+        i.innerHTML = html;
+
+    }
+
+    /* 改变地图样式 */
+    function changeMapStyle(){
+        var temp_oldStyle = mapStyleIndic; //储存前次
+        mapStyleIndic = $('input:radio[name="mapstyle"]:checked').val(); //获取当前
+        if (temp_oldStyle != mapStyleIndic) {
+            if (mapStyleIndic=="light") {
+                map.setMapStyle(mapStyle_light);
+            }
+            if (mapStyleIndic=="night") {
+                map.setMapStyle(mapStyle_night);
+            }
+        }
+    }
+
+    
+    /* 绘制范围环函数 */
+    function setRangeCircle(){
+        var tempIndic = $("#rangeCircleOpen");
+        /* 若开启绘制功能，启用输入框 */
+        if (tempIndic.prop("checked")) {
+            $("#rangeInput_number").removeAttr("disabled");
+            $("#rangeInput_lon").removeAttr("disabled");
+            $("#rangeInput_lat").removeAttr("disabled");
+            /* 若有具体数值则绘制圆形框 */
+            circleRange = $('#rangeInput_number').val();
+            circleLon = $('#rangeInput_lon').val();
+            circleLat = $('#rangeInput_lat').val();
+            if (circleRange && circleLat && circleLon) {
+                /* 若数值改变则重设半径和中心 */
+                if (circleRangeOld != circleRange || circleLonOld != circleLon || circleLatOld != circleLat){
+                    for (var i=0; i<5; i++){
+                        map.removeOverlay(rangeCircleMarker[i]);
+                        rangeCircleMarker[i].setCenter(new BMap.Point(circleLon, circleLat));
+                        rangeCircleMarker[i].setRadius(circleRange*1000*0.2*(i+1));
+                        map.addOverlay(rangeCircleMarker[i]);
+                    }
+                }
+                circleRangeOld = circleRange; //储存当前信息
+                circleLatOld = circleLat;
+                circleLonOld = circleLon;
+            }
+        }
+        /* 若关闭绘制功能，清除范围环，禁用输入框 */
+        else {
+            $("#rangeInput_number").attr("disabled",true);
+            $("#rangeInput_lon").attr("disabled",true);
+            $("#rangeInput_lat").attr("disabled",true);
+            for (var i=0; i<5; i++){
+                map.removeOverlay(rangeCircleMarker[i]);
+            }
+            circleRangeOld = null;
+            circleLatOld = null;
+            circleLonOld = null;
+        }
+    }
+
+
+    
+
+
+
+    function fetchData(){
+        $.getJSON('http://219.224.161.159:28080/data.json', function(data){
+            var stillhere = {}; //记录飞机是否仍在此处，若未能接收到信息则判定已不在 
+                       
+
+            for (var j=0; j<data.length; j++) {
+                var plane = data[j];
+                var marker = null;
+                var label = null;
+                stillhere[plane.hex] = true;
+                plane.flight = $.trim(plane.flight); // 删除字符串两边的空格 
+
+                if (Planes[plane.hex]) { //对已经存在于Planes序列中的飞机(已经存在，状态改变的)
+                    var myplane = Planes[plane.hex];
+                    //historyPoints[plane.hex].push( new BMap.Point(plane.lon, plane.lat));
+                    marker = myplane.marker; //从Planes中取到相应的飞机，再取到该marker
+                    map.removeOverlay(marker);
+                    //marker.setPosition(new BMap.Point(plane.lon, plane.lat));
+                    //marker.setIcon(setIconInfo(plane));
+                    //map.addOverlay(marker);
+                    
+
+                    /* 重新生成该marker */
+                    marker = new BMap.Marker(new BMap.Point(plane.lon ,plane.lat),setIconInfo(plane)); //重新创建marker
+                    map.addOverlay(marker); //显示marker
+                    plane.marker = marker; //储存marker
+                    marker.planehex = plane.hex;
+                    Planes[plane.hex] = plane; //Planes储存每架飞机的信息 
+                    plane.marker.addEventListener("click", selectPlane);
+                    
+                    /* 放大度大于9或该飞机为当前所选时，更新标牌 */
+                    if(map.getZoom() > 9 || Selected == plane.hex){
+                        label = new BMap.Label(getLabelText(plane),{offset:new BMap.Size(30,-20)}); /* 为飞机创建标签 */
+                        label.setStyle({maxWidth: "none",
+                                        border: "0px",
+                                        backgroundColor: "rgba(255,255,255,0.5)"});
+                        marker.setLabel(label);
+                    }
+
+                    /* 若为当前选中的且开启跟踪功能，跟踪 */
+                    if (Selected == plane.hex){
+                        var tempIndic = $("#planeTracking");
+                        if (tempIndic.prop("checked")) {
+                            map.panTo(new BMap.Point(plane.lon, plane.lat));
+                        }
+                    }
+                    
+
+                    var point_temp = new BMap.Point(plane.lon, plane.lat);
+                    var trace_temp = new BMap.Polyline([point_now[plane.hex],point_temp], setTraceInfo(plane));
+                    
+                    planeTrace[plane.hex].push(trace_temp); //将此次轨迹存入该飞机的轨迹数组
+                    //若全部显示模式，或为当前选中，显示轨迹
+                    var traceShowIndic = $("#traceShowing");
+                    if (traceShowIndic.prop("checked")) {
+                        map.addOverlay(trace_temp);
+                    }
+                    else {
+                        if (Selected == plane.hex) {
+                            map.addOverlay(trace_temp);
+                        }
+                    }
+                    point_now[plane.hex] = point_temp; //储存当前位置,以备生成下一段轨迹
+
+
+                    myplane.altitude = plane.altitude;
+                    myplane.speed = plane.speed;
+                    myplane.lat = plane.lat;
+                    myplane.lon = plane.lon;
+                    myplane.track = plane.track;
+                    myplane.flight = plane.flight;
+                    if (myplane.hex == Selected){
+                        refreshSelectInfo();
+                    }
+                }
+                else{ //对不存在于Planes序列中的飞机(新到的)
+                    marker = new BMap.Marker(new BMap.Point(plane.lon ,plane.lat),setIconInfo(plane)); //为新到飞机创建marker
+                    map.addOverlay(marker); //显示marker
+                    
+                    /* 更新标牌 */
+                    if (map.getZoom()>9){
+                        label = new BMap.Label(getLabelText(plane),{offset:new BMap.Size(30,-20)}); //为新到飞机创建标签 
+                        label.setStyle({maxWidth: "none",
+                                        border: "0px",
+                                        backgroundColor: "rgba(255,255,255,0.5)"});
+                        marker.setLabel(label) //显示标签
+                    }
+                    
+
+                    plane.marker = marker; //储存marker
+                    marker.planehex = plane.hex;
+                    Planes[plane.hex] = plane; //Planes储存每架飞机的信息 
+                    //historyPoints[plane.hex] = []; //初始化历史位置序列 
+                    planeTrace[plane.hex] = []; //初始化轨迹序列
+                    point_now[plane.hex] = new BMap.Point(plane.lon, plane.lat); //存入当前位置
+                    plane.marker.addEventListener("click", selectPlane);
+                }
+
+                
+                /* todo: 检测有无航班号，若无则不显示 */
+            }
+
+            NumOfPlanes = data.length;
+            
+            /* 移除已不在的飞机 */
+            for (var p in Planes) {
+                if (!stillhere[p]){
+                    Planes[p].marker.enableMassClear();
+                    map.removeOverlay(Planes[p].marker);
+                    for (var i = 0; i < planeTrace[p].length; i++){
+                        map.removeOverlay(planeTrace[p][i]);
+                    }
+                    delete Planes[p];
+                    delete planeTrace[p];
+                    delete point_now[p];
+                }
+            }
+            
+            }
+        );
+    }
+
+
+
+    /* 点击事件，保存设置信息到localStorage */
+    $(".btn.btn-primary").click(function(){
+        var generalSettings ={
+            planeTracking: $("#planeTracking").prop("checked"), //追踪开启
+            traceShowing: $("#traceShowing").prop("checked") //轨迹全部显示
+        };
+        var mapSettings = {
+            mapStyle: $('input:radio[name="mapstyle"]:checked').val(), //地图风格
+            circleOn: $("#rangeCircleOpen").prop("checked"), //范围环开启
+            circleRange: $('#rangeInput_number').val(),
+            circleLon: $('#rangeInput_lon').val(),
+            circleLat: $('#rangeInput_lat').val()
+        };
+        var labelSettings = {
+            lab_ICAO: $("#labelICAO").prop("checked"),
+            lab_Flight: $("#labelFlight").prop("checked"),
+            lab_Altitude: $("#labelAltitude").prop("checked"),
+            lab_Speed: $("#labelSpeed").prop("checked")
+        };
+        localStorage.setItem('general',JSON.stringify(generalSettings));
+        localStorage.setItem('map',JSON.stringify(mapSettings));
+        localStorage.setItem('label',JSON.stringify(labelSettings));
+        alert("设置已保存");
+    });
+    /*
+    function saveSettings(){
+        var generalSettings ={
+            planeTracking: $("#planeTracking").prop("checked"), //追踪开启
+            traceShowing: $("#traceShowing").prop("checked") //轨迹全部显示
+        };
+        var mapSettings = {
+            mapStyle: $('input:radio[name="mapstyle"]:checked').val(), //地图风格
+            circleOn: $("#rangeCircleOpen").prop("checked"), //范围环开启
+            circleRange: $('#rangeInput_number').val(),
+            circleLon: $('#rangeInput_lon').val(),
+            circleLat: $('#rangeInput_lat').val()
+        };
+        var labelSettings = {
+            lab_ICAO: $("#labelICAO").prop("checked"),
+            lab_Flight: $("#labelFlight").prop("checked"),
+            lab_Altitude: $("#labelAltitude").prop("checked"),
+            lab_Speed: $("#labelSpeed").prop("checked")
+        };
+        localStorage.setItem('general',JSON.stringify(generalSettings));
+        localStorage.setItem('map',JSON.stringify(mapSettings));
+        localStorage.setItem('label',JSON.stringify(labelSettings));
+        alert("setting saved");
+    }*/
+
+    /* 从localStorage读取设置信息 */
+    function loadSettings(){
+        var generalSettings = JSON.parse(localStorage.getItem('general'));
+        $("#planeTracking").prop("checked",generalSettings.planeTracking);
+        $("#traceShowing").prop("checked",generalSettings.traceShowing);
+        
+        var mapSettings = JSON.parse(localStorage.getItem('map'));
+        if (mapSettings.mapStyle == "light"){
+            $("input:radio[value='light']").attr('checked','true');
+        }
+        if (mapSettings.mapStyle == "night"){
+            $("input:radio[value='night']").attr('checked','true');
+        }
+        $("#rangeCircleOpen").prop("checked",mapSettings.circleOn);
+        $('#rangeInput_number').val(mapSettings.circleRange);
+        $('#rangeInput_lon').val(mapSettings.circleLon);
+        $('#rangeInput_lat').val(mapSettings.circleLat);
+        
+        var labelSettings = JSON.parse(localStorage.getItem('label'));
+        $("#labelICAO").prop("checked",labelSettings.lab_ICAO);
+        $("#labelFlight").prop("checked",labelSettings.lab_Flight);
+        $("#labelAltitude").prop("checked",labelSettings.lab_Altitude);
+        $("#labelSpeed").prop("checked",labelSettings.lab_Speed);
+    }
+
+    function setTable(){
+        var temp = '<tr>';
+        temp += '<th scope="row">' + 'str1' + '</th>';//编号
+        temp += '<td>' + 'str2' + '</td>';//flight
+        temp += '<td>' + 'str2' + '</td>';//speed
+        temp += '<td>' + 'str2' + '</td>';//altitude
+        temp += '<td>' + 'str2' + '</td>';//icao
+        temp += '</tr>'
+        $("#tablebody").append(temp);
+    }
+
+
+    function initialize(){
+        //loadSettings();
+        /* 以1s的周期获取数据及刷新信息板 */
+        window.setInterval(function() {
+            pts=fetchData();
+            refreshNumInfo();
+            changeMapStyle();
+            setRangeCircle();
+            //setTable();
+        }, 1000);
+    }
+
+</script> 
+ </div>
+ <div id="footer">
+版本：测试版V3.0
+</div>
+</body>  
+</html>
